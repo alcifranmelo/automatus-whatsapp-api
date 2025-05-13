@@ -1,9 +1,5 @@
 version: '3.8'
 
-networks:
-  public-network:
-    driver: bridge
-
 services:
   api:
     container_name: codechat_api
@@ -21,7 +17,7 @@ services:
       - LOG_COLOR=true
 
       - DATABASE_ENABLED=true
-      - DATABASE_URL=postgres://[USER]:[PASS]@[HOST]:[PORT]/[DATABASE_NAME]?schema=public
+      - DATABASE_URL=postgres://postgres:smb@postgres_server_smb:5432/smb_db?schema=public
       - DATABASE_SYNC_MESSAGES=true
       - DATABASE_SAVE_DATA_NEW_MESSAGE=true
       - DATABASE_SAVE_MESSAGE_UPDATE=true
@@ -55,19 +51,27 @@ services:
       - PROVIDER_PREFIX=codechat
 
       - BASE_URL=
-
-      # - S3_ENABLED=false
-      # - S3_ACCESS_KEY=[ACCESS_KEY]
-      # - S3_SECRET_KEY=[SECRET_KEY]
-      # - S3_BUCKET=[BUCKET]
-      # - S3_PORT=9000
-      # - S3_ENDPOINT=[ENDPOINT]
-      # - S3_USE_SSL=false
     networks:
-      - public-network
+      - public_network
+
+  postgres_server:
+    image: postgres:latest
+    container_name: postgres_server_smb
+    environment:
+      POSTGRES_PASSWORD: 'smb'
+      POSTGRES_DB: smb_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - public_network
 
 volumes:
-  # In terminal run: docker volume create --name=instances_connecteds
   instances_connecteds:
-    external:
-      name: instances_connecteds
+    external: true
+  postgres_data:
+
+networks:
+  public_network:
+    driver: bridge
