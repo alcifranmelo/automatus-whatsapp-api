@@ -1157,7 +1157,7 @@ export class WAStartupService {
   }
 
   private createJid(number: string): string {
-    if (number.includes('@g.us') || number.includes('@s.whatsapp.net')) {
+    if (number.includes('@g.us') || number.includes('@s.whatsapp.net') || number.includes('@bot')) {
       return number;
     }
 
@@ -2293,14 +2293,20 @@ export class WAStartupService {
   }
 
   public async fetchChats(type?: string) {
-    const where = { instanceId: this.instance.id };
-    if (['chats', 'group'].includes(type)) {
-      where['remoteJid'] = {
-        contains: '@s.whatsapp.net',
-      };
-    }
-    return await this.repository.chat.findMany({ where });
+  // base filter
+  const where: any = { instanceId: this.instance.id };
+
+  if (['chats', 'group'].includes(type)) {
+    // replace single contains with an OR over the three patterns
+    where.OR = [
+      { remoteJid: { contains: '@bot'            } },
+      { remoteJid: { contains: '@s.whatsapp.net' } },
+      { remoteJid: { contains: '@g.us'           } },
+    ];
   }
+
+  return await this.repository.chat.findMany({ where });
+}
 
   public async rejectCall(data: RejectCallDto) {
     try {
