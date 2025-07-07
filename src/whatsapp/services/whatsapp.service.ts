@@ -1157,7 +1157,7 @@ export class WAStartupService {
   }
 
   private createJid(number: string): string {
-    if (number.includes('@g.us') || number.includes('@s.whatsapp.net')) {
+    if (number.includes('@g.us') || number.includes('@s.whatsapp.net') || number.includes('@bot')) {
       return number;
     }
 
