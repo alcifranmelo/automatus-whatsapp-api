@@ -2298,11 +2298,9 @@ export class WAStartupService {
 
   if (['chats', 'group'].includes(type)) {
     // replace single contains with an OR over the three patterns
-    where.OR = [
-      { remoteJid: { contains: '@bot'            } },
-      { remoteJid: { contains: '@s.whatsapp.net' } },
-      { remoteJid: { contains: '@g.us'           } },
-    ];
+    where['remoteJid'] = {
+        contains: '@s.whatsapp.net',
+      };
   }
 
   return await this.repository.chat.findMany({ where });
